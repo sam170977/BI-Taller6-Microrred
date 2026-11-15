@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Datos pesados (se descargan de Zenodo, no se suben)
+data/*
+!data/README.md
+*.sqlite
+*.sqlite.zst
+*.zst
+*.zip
+
+# Credenciales
+.env
+*.secret.yaml
+k8s/secret.yaml
+
+# Power BI (se versiona el formato .pbip, no el .pbix)
+*.pbix
+.pbi/
+localSettings.json
+cache.abf
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
