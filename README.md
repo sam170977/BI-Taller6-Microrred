@@ -9,10 +9,10 @@ Solución de Inteligencia de Negocios de extremo a extremo sobre la telemetría 
 ## Integrantes
 | Integrante | Responsabilidad principal |
 |---|---|
-| (nombre 1) | Repositorio, Power BI, ética y seguridad, ensamblado del informe |
-| (nombre 2) | Datos, diagnóstico de calidad, ETL |
-| (nombre 3) | Catálogo de indicadores, modelo dimensional, PostgreSQL |
-| (nombre 4) | Docker, Kubernetes, Grafana, simulador |
+| Sammy Arteaga Velasquez  | Repositorio, Power BI, ética y seguridad, ensamblado del informe |
+| Shirley Johanna Grajales Arango | Datos, diagnóstico de calidad, ETL |
+| Yuritza Mendoza Mosquera | Catálogo de indicadores, modelo dimensional, PostgreSQL |
+| Laura Mejia Delgado | Docker, Kubernetes, Grafana, simulador |
 
 ## Datos y licencia
 Datos: OpenCEM v1.0.0 (Zenodo, DOI 10.5281/zenodo.21436223), licencia CC BY 4.0.
@@ -42,7 +42,12 @@ _(pendiente: Docker, kubectl, distribución de Kubernetes, DBeaver, Power BI Des
 _(pendiente: un comando para levantar y otro para eliminar el despliegue)_
 
 ## Ética y seguridad
-_(pendiente: tratamiento de la tabla de contexto, Ley 1581 de 2012, manejo de credenciales)_
+Análisis completo en [`docs/etica-seguridad.md`](docs/etica-seguridad.md). Resumen:
+
+- **Datos personales (Ley 1581 de 2012):** la tabla de contexto se usa solo para explicar el comportamiento energético, nunca para evaluar o vigilar personas. El ETL aplica minimización: los campos que identifican personas se pseudonimizan o se descartan antes de la capa Gold, y los tableros consumen solo esa capa.
+- **Credenciales:** fuera del código y del repositorio (`.env` y `Secret` de Kubernetes excluidos con `.gitignore`; solo se versionan plantillas `.env.example`).
+- **Mínimo privilegio:** Power BI y Grafana consultan con un usuario de solo lectura de PostgreSQL.
+- **Exposición de red:** PostgreSQL solo es accesible dentro del clúster; el acceso desde el anfitrión es por `port-forward` local.
 
 ## Flujo de trabajo
 Cada integrante trabaja en su propia rama (`feature/etl`, `feature/modelo`, `feature/k8s`, `feature/powerbi`) con commits pequeños y frecuentes, y se integra a `main` mediante pull request.
