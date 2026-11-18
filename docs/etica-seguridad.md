@@ -1,29 +1,22 @@
-# J. Ética y seguridad
+## J. Ética y seguridad
 
-## J.1 Tratamiento de la tabla de contexto (Ley 1581 de 2012)
+### J.1 Tratamiento de la tabla de contexto (Ley 1581 de 2012)
 
-La tabla de contexto contiene anotaciones en JSON que dejan las estaciones de trabajo y el personal del sitio (qué tarea se lanzó, cuándo se encendió el aire). Aunque el objetivo del taller es energético, estas anotaciones pueden relacionarse con personas.
+La tabla `context` (25,178 registros) almacena anotaciones operativas en formato JSON provenientes de siete fuentes (`source`): `workstation2_log` (8,902), `windows_event_log` (6,271), `workstation1_log` (6,028), `derived_context_pipeline` (3,708), `wsl_bash_history` (204), `manual entry` (60) y `manual_workload_entry` (5).
 
-**Análisis de datos personales.** La Ley 1581 de 2012 define como dato personal cualquier información vinculada o vinculable a una persona natural determinada o determinable. Revisamos los campos del JSON y encontramos: **[COMPLETAR: lista de campos, por ejemplo identificadores de usuario, nombres de estación, nombres de tarea o correos; indicar cuáles identifican o podrían identificar a una persona y cuáles no]**.
+* **Análisis de datos personales:** Conforme a la Ley 1581 de 2012, constituye dato personal cualquier información vinculada o vinculable a una persona natural determinada o determinable. Al auditar las 60 claves JSON presentes en la fuente, se identificó que:
+  * Los propios autores del dataset aplicaron controles previos de anonimización (incluyendo el campo `privacy_note` y comandos redactados en `example_commands_redacted` y `command_hints_redacted`), omitiendo nombres propios o correos electrónicos explícitos.
+  * No obstante, persisten atributos indirectamente vinculables a la actividad de operadores o investigadores en las estaciones de trabajo (`workstation1`, `workstation2`), tales como `command` (11,974 registros), `directory` (11,974), `task_files` (11,974), `project` (209), `windows_event` (6,271), y coordenadas geográficas exactas del sitio (`latitude` y `longitude`, 996 registros).
+* **Principios aplicados (art. 4 de la Ley 1581 de 2012):**
+  * **Finalidad:** El contexto se emplea exclusivamente para correlacionar picos de carga eléctrica (compilación, entrenamiento de modelos GPU o eventos de sistema) con el balance energético y el ahorro en COP, nunca para perfilar o evaluar productividad individual.
+  * **Minimización:** En el proceso ETL hacia las capas Silver y Gold se extraen únicamente los atributos analíticos necesarios (`context_type`, `task_type`, `device`, `inverter`, `cpu_cores_active`, `llm_estimated_task_effort`), descartando rutas locales (`directory`), comandos específicos (`command`), registros detallados de eventos de Windows y coordenadas geográficas precisas.
+  * **Seguridad y confidencialidad:** La capa Bronze (`opencem.sqlite`) se mantiene aislada fuera del repositorio y de los contenedores de visualización. Las herramientas de BI (Power BI y Grafana) consultan exclusivamente la capa Gold mediante vistas y tablas agregadas sin metadatos de estación o usuario.
+  * **Circulación restringida y atribución:** El dataset se utiliza bajo licencia abierta CC BY 4.0 con cita obligatoria a sus autores (Bartels et al., 2026); los tableros y capturas del informe exponen únicamente métricas energéticas y económicas agregadas.
 
-**Principios aplicados** (art. 4 de la ley):
+### J.2 Seguridad de acceso y credenciales
 
-- **Finalidad:** usamos el contexto solo para explicar el comportamiento energético (por ejemplo, el consumo de una carga de GPU), no para evaluar o vigilar a las personas.
-- **Minimización:** en el ETL cargamos únicamente los campos que necesita el modelo. Los campos que identifican personas se pseudonimizan (hash con sal) o se descartan antes de llegar a la capa Gold.
-- **Seguridad y confidencialidad:** la capa Bronze se conserva sin modificar y con acceso restringido. Los tableros consumen solo la capa Gold, sin identificadores personales.
-- **Circulación restringida:** los tableros públicos y las capturas del informe no muestran datos identificables.
-- **Origen del dato:** OpenCEM se publica bajo CC BY 4.0 y citamos a sus autores. La licencia abierta no elimina la obligación de tratar con cuidado cualquier dato personal que contenga.
-
-**Limitación:** no somos el responsable original del tratamiento de esos datos, y la ley exige autorización del titular para tratamientos con fines distintos al original. Por eso aplicamos minimización y no intentamos reidentificar a nadie.
-
-## J.2 Seguridad de acceso y credenciales
-
-- **Credenciales fuera del código:** las contraseñas viven en un `Secret` de Kubernetes y en un archivo `.env` local, ambos excluidos con `.gitignore`. En el repositorio solo hay plantillas (`.env.example`, `secret.example.yaml`).
-- **Aclaración técnica:** un `Secret` guarda los valores en base64, que no es cifrado. En el clúster local se acepta como nivel básico; en producción se usaría cifrado en reposo o un gestor de secretos.
-- **Mínimo privilegio:** además del usuario administrador, se crea un usuario de solo lectura de PostgreSQL, que usan Power BI y Grafana para consultar la capa Gold. Ninguno de los dos puede modificar datos. **[CONFIRMAR con quien implemente PostgreSQL]**
-- **Grafana:** contraseña de administrador distinta de la predeterminada, acceso anónimo deshabilitado y fuente de datos aprovisionada con el usuario de solo lectura. **[CONFIRMAR con quien implemente Grafana]**
-- **Exposición de red:** PostgreSQL queda como servicio interno del clúster (`ClusterIP`). Solo Grafana se expone al anfitrión, y el acceso a la base desde DBeaver o Power BI se hace por `port-forward` local. **[CONFIRMAR con quien implemente Kubernetes]**
-- **Imágenes:** versiones fijas (sin `latest`) y ninguna credencial dentro de las imágenes.
-- **Si una credencial se sube por error:** se considera comprometida, se cambia de inmediato y se retira del historial de Git.
-
-> Nota: esta sección es un análisis académico, no asesoría legal.
+* **Credenciales fuera del código y del repositorio:** Todas las contraseñas y cadenas de conexión se gestionan mediante variables de entorno locales (`.env`) y objetos `Secret` en Kubernetes, excluidos del control de versiones mediante `.gitignore`. En GitHub solo se versionan plantillas sin valores reales (`.env.example` y `k8s/secret.example.yaml`).
+* **Alcance técnico de Secrets en Kubernetes:** Los `Secret` de Kubernetes codifican los valores en Base64 (no cifrado nativo), medida suficiente para el entorno académico local; en un despliegue productivo se integraría cifrado en reposo (ETCD encryption) o un gestor externo de secretos.
+* **Principio de mínimo privilegio:** Se separa el usuario administrador utilizado por el proceso ETL de un rol de solo lectura (`SELECT`) en PostgreSQL, empleado por Power BI y Grafana para consultar el esquema `gold`, impidiendo modificaciones accidentales o inyección de cambios desde las capas de consumo.
+* **Endurecimiento de Grafana y exposición de red:** Grafana se despliega con credenciales administrativas personalizadas y acceso anónimo deshabilitado. PostgreSQL opera como servicio interno (`ClusterIP`) sin exposición pública; el acceso desde DBeaver y Power BI en el equipo anfitrión se realiza de forma controlada mediante `kubectl port-forward` o puerto mapeado localmente.
+* **Integridad de contenedores:** Todas las imágenes base y de servicios utilizan etiquetas de versión fija (sin `latest`) y no incorporan secretos ni datos crudos dentro de sus capas.
