@@ -30,3 +30,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+*.sqlite
+*.db
+**/localSettings.json
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
