@@ -1,0 +1,27 @@
+model Model
+	culture: es-MX
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-CO
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["bi vw_calidad_diaria","bi vw_powerbi_diario","gold dim_fecha","gold dim_hora","gold fact_energia_intervalo","_Medidas"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table 'bi vw_calidad_diaria'
+ref table DateTableTemplate_f21449d7-c1a1-4ff6-91f9-2c03d88e1f6c
+ref table 'bi vw_powerbi_diario'
+ref table 'gold dim_fecha'
+ref table 'gold dim_hora'
+ref table 'gold fact_energia_intervalo'
+ref table LocalDateTable_416cfc2e-e6b7-427a-b507-d2b93e42940e
+ref table 'Tarifa Escenario'
+ref table _Medidas
+
+ref cultureInfo es-MX
+

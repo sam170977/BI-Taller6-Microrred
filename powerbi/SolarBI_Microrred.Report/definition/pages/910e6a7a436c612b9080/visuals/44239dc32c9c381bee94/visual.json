@@ -1,0 +1,85 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "44239dc32c9c381bee94",
+  "position": {
+    "x": 996.7467909005303,
+    "y": 379.61639490508992,
+    "z": 4,
+    "height": 667.88125092927589,
+    "width": 858.70446548049756,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "hundredPercentStackedBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "gold dim_fecha"
+                    }
+                  },
+                  "Property": "nombre_mes"
+                }
+              },
+              "queryRef": "gold dim_fecha.nombre_mes",
+              "nativeQueryRef": "nombre_mes",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Autoconsumo Solar (kWh)"
+                }
+              },
+              "queryRef": "_Medidas.Autoconsumo Solar (kWh)",
+              "nativeQueryRef": "Autoconsumo Solar (kWh)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Red Directa a Carga (kWh)"
+                }
+              },
+              "queryRef": "_Medidas.Red Directa a Carga (kWh)",
+              "nativeQueryRef": "Red Directa a Carga (kWh)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Batería Descargada (kWh)"
+                }
+              },
+              "queryRef": "_Medidas.Batería Descargada (kWh)",
+              "nativeQueryRef": "Batería Descargada (kWh)"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

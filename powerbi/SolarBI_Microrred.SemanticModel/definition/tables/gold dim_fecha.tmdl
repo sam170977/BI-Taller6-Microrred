@@ -1,0 +1,132 @@
+table 'gold dim_fecha'
+	lineageTag: 0c9c26a3-6e05-4490-8103-f155ddd93f3c
+	dataCategory: Time
+
+	column fecha_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 966c83f8-95cd-424c-ab9f-fb902003bf1b
+		summarizeBy: none
+		sourceColumn: fecha_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: a8dda561-36cb-4f5e-979b-979620953147
+		summarizeBy: none
+		sourceColumn: fecha
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column anio
+		dataType: int64
+		formatString: 0
+		lineageTag: ab682c60-fe59-4147-928a-9aaf61585216
+		summarizeBy: sum
+		sourceColumn: anio
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column trimestre
+		dataType: int64
+		formatString: 0
+		lineageTag: 1cb8de0f-a029-4d0d-a644-a415aaa9f87b
+		summarizeBy: sum
+		sourceColumn: trimestre
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column mes
+		dataType: int64
+		formatString: 0
+		lineageTag: 6d08f462-4a80-4024-90e9-f601f64d8a63
+		summarizeBy: sum
+		sourceColumn: mes
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre_mes
+		dataType: string
+		lineageTag: 9730aaa7-7b01-4d35-8a9f-ea3e3c912855
+		summarizeBy: none
+		sourceColumn: nombre_mes
+		sortByColumn: mes
+
+		changedProperty = SortByColumn
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column semana_iso
+		dataType: int64
+		formatString: 0
+		lineageTag: 06ececf1-b3cf-49ce-867b-caa6602a87dc
+		summarizeBy: sum
+		sourceColumn: semana_iso
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column dia_semana
+		dataType: int64
+		formatString: 0
+		lineageTag: b214bf8f-0ce7-4daf-8a83-3e694c92abde
+		summarizeBy: sum
+		sourceColumn: dia_semana
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column es_fin_de_semana
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2fa2bcb7-3a00-49ba-b443-4602c01f6121
+		summarizeBy: none
+		sourceColumn: es_fin_de_semana
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column es_festivo
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 8d68ce45-e3c2-4c63-b9b0-2eed01405e00
+		summarizeBy: none
+		sourceColumn: es_festivo
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'gold dim_fecha' = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database("localhost", "silver"),
+				    gold_dim_fecha = Origen{[Schema="gold",Item="dim_fecha"]}[Data]
+				in
+				    gold_dim_fecha
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,113 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 107.66013696101004,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 769.38305001469371,
+            "y": 0
+          },
+          "nodeIndex": "bi vw_calidad_diaria",
+          "nodeLineageTag": "ebb6ceef-5394-4da9-99a7-379098f8c185",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 709.78304391117808,
+            "y": 284
+          },
+          "nodeIndex": "bi vw_powerbi_diario",
+          "nodeLineageTag": "5b781667-4a27-42ec-b88f-21e7b4c8e12d",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 422.38305001469371,
+            "y": 0
+          },
+          "nodeIndex": "gold dim_fecha",
+          "nodeLineageTag": "0c9c26a3-6e05-4490-8103-f155ddd93f3c",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 0.5627617996774319
+          },
+          "nodeIndex": "gold dim_hora",
+          "nodeLineageTag": "eb400141-9337-4cb8-90ad-4eb7ac0cce45",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 146.61975144515077,
+            "y": 306.40293091897445
+          },
+          "nodeIndex": "gold fact_energia_intervalo",
+          "nodeLineageTag": "a3747a3c-64da-4e10-b3d7-46a46c54e990",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1053.3830500146937,
+            "y": 191.20146545948722
+          },
+          "nodeIndex": "Tarifa Escenario",
+          "nodeLineageTag": "10f25670-cdf7-454f-b67c-a3ecfc44627a",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1337.3830500146937,
+            "y": 251.20146545948722
+          },
+          "nodeIndex": "_Medidas",
+          "nodeLineageTag": "442719fd-7828-4ca6-973e-0b2f44efee7d",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Todas las tablas",
+      "zoomValue": 63.809891316891921,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Todas las tablas",
+  "defaultDiagram": "Todas las tablas"
+}
