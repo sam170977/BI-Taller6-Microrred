@@ -1,0 +1,28 @@
+table 'Tarifa Escenario'
+	lineageTag: 10f25670-cdf7-454f-b67c-a3ecfc44627a
+
+	measure 'Valor de Tarifa Escenario' = SELECTEDVALUE('Tarifa Escenario'[Tarifa Escenario], 850)
+		lineageTag: 6fcb3a4f-3844-40bb-875e-0428dbecf308
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Tarifa Escenario'
+		dataType: double
+		formatString: 0
+		lineageTag: 5dfff283-0d25-4918-861f-bfdb36e08788
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition 'Tarifa Escenario' = calculated
+		mode: import
+		source = GENERATESERIES(500, 1500, 25)
+
+	annotation PBI_Id = f69d892f0fe74f9cb4f3c5d87b1c2112
+

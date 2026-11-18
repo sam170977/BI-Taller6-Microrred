@@ -1,0 +1,51 @@
+table 'gold dim_hora'
+	lineageTag: eb400141-9337-4cb8-90ad-4eb7ac0cce45
+
+	column hora_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 9592a316-c81b-40b9-b94c-24988a458b35
+		summarizeBy: none
+		sourceColumn: hora_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column hora_inicio
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: ff8c5a2c-7341-4a16-8f4d-ff696f25b4f9
+		summarizeBy: none
+		sourceColumn: hora_inicio
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column hora
+		dataType: int64
+		formatString: 0
+		lineageTag: 00aeecd6-e657-4e15-8310-f531906cbd1b
+		summarizeBy: none
+		sourceColumn: hora
+
+		annotation SummarizationSetBy = Automatic
+
+	column franja
+		dataType: string
+		lineageTag: fb75fbe0-42b4-4960-80ee-29f83418b286
+		summarizeBy: none
+		sourceColumn: franja
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'gold dim_hora' = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database("localhost", "silver"),
+				    gold_dim_hora = Origen{[Schema="gold",Item="dim_hora"]}[Data]
+				in
+				    gold_dim_hora
+
+	annotation PBI_ResultType = Table
+

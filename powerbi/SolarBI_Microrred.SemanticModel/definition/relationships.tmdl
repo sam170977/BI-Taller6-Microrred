@@ -1,0 +1,25 @@
+relationship 140f2459-7919-4e0a-b833-e49d0d4f61e4
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'gold fact_energia_intervalo'.ts_inicio
+	toColumn: LocalDateTable_416cfc2e-e6b7-427a-b507-d2b93e42940e.Date
+
+relationship 65347966-644e-1ac2-953d-68ed63facdd2
+	fromColumn: 'bi vw_powerbi_diario'.fecha
+	toColumn: 'gold dim_fecha'.fecha
+
+relationship c59ecd2c-58d7-5f85-2dc3-6cf2fa99b873
+	fromColumn: 'bi vw_calidad_diaria'.fecha
+	toColumn: 'gold dim_fecha'.fecha
+
+relationship 1207d598-7c76-3096-a7c2-e70f873e0ff0
+	fromColumn: 'gold fact_energia_intervalo'.hora_key
+	toColumn: 'gold dim_hora'.hora_key
+
+	annotation PBI_IsFromSource = FS
+
+relationship 51089b2a-4f5b-0c3b-8f3e-1075cf9222c7
+	fromColumn: 'gold fact_energia_intervalo'.fecha_key
+	toColumn: 'gold dim_fecha'.fecha_key
+
+	annotation PBI_IsFromSource = FS
+

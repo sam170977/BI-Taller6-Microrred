@@ -1,0 +1,129 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "693a476be44e0a139e32",
+  "position": {
+    "x": 954.11607275610845,
+    "y": 22.330376170887643,
+    "z": 5,
+    "height": 245.63413787976407,
+    "width": 795.77340536254144,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "gold dim_fecha"
+                    }
+                  },
+                  "Property": "anio"
+                }
+              },
+              "queryRef": "gold dim_fecha.anio",
+              "nativeQueryRef": "Suma de anio",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "gold dim_fecha"
+                    }
+                  },
+                  "Property": "nombre_mes"
+                }
+              },
+              "queryRef": "gold dim_fecha.nombre_mes",
+              "nativeQueryRef": "nombre_mes",
+              "active": false
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "gold dim_fecha"
+                    }
+                  },
+                  "Property": "fecha"
+                }
+              },
+              "queryRef": "gold dim_fecha.fecha",
+              "nativeQueryRef": "fecha",
+              "active": false
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Autoconsumo Solar (kWh)"
+                }
+              },
+              "queryRef": "_Medidas.Autoconsumo Solar (kWh)",
+              "nativeQueryRef": "Autoconsumo Solar (kWh)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Ahorro Base (COP)"
+                }
+              },
+              "queryRef": "_Medidas.Ahorro Base (COP)",
+              "nativeQueryRef": "Ahorro Base (COP)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Ahorro Escenario What-If (COP)"
+                }
+              },
+              "queryRef": "_Medidas.Ahorro Escenario What-If (COP)",
+              "nativeQueryRef": "Ahorro Escenario What-If (COP)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Costo Importación Red (COP)"
+                }
+              },
+              "queryRef": "_Medidas.Costo Importación Red (COP)",
+              "nativeQueryRef": "Costo Importación Red (COP)"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

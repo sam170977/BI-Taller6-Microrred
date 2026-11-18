@@ -1,0 +1,63 @@
+table 'bi vw_calidad_diaria'
+	lineageTag: ebb6ceef-5394-4da9-99a7-379098f8c185
+
+	column inversor_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 832c0e52-f2c6-4f10-ba4d-35d57a5501c6
+		summarizeBy: sum
+		sourceColumn: inversor_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 07cd6983-fc41-48ad-8d85-c92e11e87889
+		summarizeBy: none
+		sourceColumn: fecha
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column intervalos_presentes
+		dataType: int64
+		formatString: 0
+		lineageTag: 07b29442-5299-41e0-8fee-f4f433b8f2f0
+		summarizeBy: sum
+		sourceColumn: intervalos_presentes
+
+		annotation SummarizationSetBy = Automatic
+
+	column disponibilidad_intervalos_pct
+		dataType: double
+		lineageTag: 8d51fd4c-3fc1-49ee-8a10-ed08af124fae
+		summarizeBy: sum
+		sourceColumn: disponibilidad_intervalos_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column datos_validos_pct
+		dataType: double
+		lineageTag: 2916b40c-5613-472b-a87a-c368f6c0f96d
+		summarizeBy: sum
+		sourceColumn: datos_validos_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'bi vw_calidad_diaria' = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database("localhost", "silver"),
+				    bi_vw_calidad_diaria = Origen{[Schema="bi",Item="vw_calidad_diaria"]}[Data]
+				in
+				    bi_vw_calidad_diaria
+
+	annotation PBI_ResultType = Table
+

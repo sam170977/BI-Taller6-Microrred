@@ -1,0 +1,225 @@
+table 'bi vw_powerbi_diario'
+	lineageTag: 5b781667-4a27-42ec-b88f-21e7b4c8e12d
+
+	column fecha
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b5df7ffe-a151-4aad-a4a0-7edee6bd0a1e
+		summarizeBy: none
+		sourceColumn: fecha
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column anio
+		dataType: int64
+		formatString: 0
+		lineageTag: c97c7286-7b0d-4d32-8c57-8f22b2bd9f85
+		summarizeBy: sum
+		sourceColumn: anio
+
+		annotation SummarizationSetBy = Automatic
+
+	column trimestre
+		dataType: int64
+		formatString: 0
+		lineageTag: 81d09a04-419e-4ff7-bee9-9937e7d8efb7
+		summarizeBy: sum
+		sourceColumn: trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column mes
+		dataType: int64
+		formatString: 0
+		lineageTag: c6997faa-d4e1-42f3-8ac9-196167ffe2e7
+		summarizeBy: sum
+		sourceColumn: mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column nombre_mes
+		dataType: string
+		lineageTag: e7edb261-c80f-4db8-aa76-75d66390cede
+		summarizeBy: none
+		sourceColumn: nombre_mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column inversor_id
+		dataType: int64
+		formatString: 0
+		lineageTag: d32c7f3e-c034-421a-ae83-d1bccd07ef98
+		summarizeBy: sum
+		sourceColumn: inversor_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column inversor
+		dataType: string
+		lineageTag: 001fa9f7-65ab-4d4a-8268-b467b2d2743d
+		summarizeBy: none
+		sourceColumn: inversor
+
+		annotation SummarizationSetBy = Automatic
+
+	column operador
+		dataType: string
+		lineageTag: 03a441a7-a16f-4377-8e69-9eca3b1e8169
+		summarizeBy: none
+		sourceColumn: operador
+
+		annotation SummarizationSetBy = Automatic
+
+	column tarifa_cop_kwh
+		dataType: double
+		lineageTag: 6d8ba748-48e8-4ad0-91cd-c8272d0717df
+		summarizeBy: sum
+		sourceColumn: tarifa_cop_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column energia_solar_kwh
+		dataType: double
+		lineageTag: 48e35355-b61c-4220-b38a-b4c22dc5cc0a
+		summarizeBy: sum
+		sourceColumn: energia_solar_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column energia_carga_kwh
+		dataType: double
+		lineageTag: 7f21f772-d6c9-49a6-9e65-7829f6e9cc16
+		summarizeBy: sum
+		sourceColumn: energia_carga_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column energia_red_carga_kwh
+		dataType: double
+		lineageTag: 16660d48-be7e-4911-ad6a-3e207f8440d4
+		summarizeBy: sum
+		sourceColumn: energia_red_carga_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column energia_red_bateria_kwh
+		dataType: double
+		lineageTag: 95c2a555-540c-44ef-bb73-7a23553fd2eb
+		summarizeBy: sum
+		sourceColumn: energia_red_bateria_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column energia_red_importada_kwh
+		dataType: double
+		lineageTag: b3b60cda-85e3-41cc-b8a7-ae47f43e07fd
+		summarizeBy: sum
+		sourceColumn: energia_red_importada_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column energia_bateria_cargada_kwh
+		dataType: double
+		lineageTag: 8a8b41cd-7ed3-455c-a7be-5db0f13a4847
+		summarizeBy: sum
+		sourceColumn: energia_bateria_cargada_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column energia_bateria_descargada_kwh
+		dataType: double
+		lineageTag: 59617a5e-74ac-43fa-9b7e-bbb9704b7192
+		summarizeBy: sum
+		sourceColumn: energia_bateria_descargada_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column autoconsumo_solar_kwh
+		dataType: double
+		lineageTag: 7ea58191-aa54-42de-9832-4bb800f77e16
+		summarizeBy: sum
+		sourceColumn: autoconsumo_solar_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column autosuficiencia_pct
+		dataType: double
+		lineageTag: 9cc6da6a-751e-4aad-a3df-9a3e0125048c
+		summarizeBy: sum
+		sourceColumn: autosuficiencia_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column costo_evitado_cop
+		dataType: double
+		lineageTag: 9432da34-d63e-4dd9-9bb1-26c66cb17750
+		summarizeBy: sum
+		sourceColumn: costo_evitado_cop
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column costo_contrafactual_cop
+		dataType: double
+		lineageTag: 6ab0b726-60a0-499c-8d1d-6404e209f125
+		summarizeBy: sum
+		sourceColumn: costo_contrafactual_cop
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column costo_importacion_cop
+		dataType: double
+		lineageTag: f3082d3f-a53c-4634-a93e-368184ea951f
+		summarizeBy: sum
+		sourceColumn: costo_importacion_cop
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ahorro_neto_cop
+		dataType: double
+		lineageTag: d38e192b-40f4-454b-b512-a6aa856706ff
+		summarizeBy: sum
+		sourceColumn: ahorro_neto_cop
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'bi vw_powerbi_diario' = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database("localhost", "silver"),
+				    bi_vw_powerbi_diario = Origen{[Schema="bi",Item="vw_powerbi_diario"]}[Data]
+				in
+				    bi_vw_powerbi_diario
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "47fbede4e15ce1a1d655",
+  "position": {
+    "x": 314.65530058978044,
+    "y": 379.61639490508992,
+    "z": 5,
+    "height": 684.12152450810322,
+    "width": 682.0914903107498,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "gold dim_hora"
+                    }
+                  },
+                  "Property": "hora"
+                }
+              },
+              "queryRef": "gold dim_hora.hora",
+              "nativeQueryRef": "hora",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "gold fact_energia_intervalo"
+                        }
+                      },
+                      "Property": "e_pv_kwh"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(gold fact_energia_intervalo.e_pv_kwh)",
+              "nativeQueryRef": "Suma de e_pv_kwh"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "gold fact_energia_intervalo"
+                        }
+                      },
+                      "Property": "e_carga_kwh"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(gold fact_energia_intervalo.e_carga_kwh)",
+              "nativeQueryRef": "Suma de e_carga_kwh"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "gold fact_energia_intervalo"
+                        }
+                      },
+                      "Property": "e_red_kwh"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(gold fact_energia_intervalo.e_red_kwh)",
+              "nativeQueryRef": "Suma de e_red_kwh"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Aggregation": {
+                "Expression": {
+                  "Column": {
+                    "Expression": {
+                      "SourceRef": {
+                        "Entity": "gold fact_energia_intervalo"
+                      }
+                    },
+                    "Property": "e_pv_kwh"
+                  }
+                },
+                "Function": 0
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

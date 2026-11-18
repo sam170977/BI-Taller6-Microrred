@@ -1,0 +1,122 @@
+table 'gold fact_energia_intervalo'
+	lineageTag: a3747a3c-64da-4e10-b3d7-46a46c54e990
+
+	column inversor_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 76ae684f-f226-4bc0-92c8-fba93276b30a
+		summarizeBy: sum
+		sourceColumn: inversor_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column ts_inicio
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b8cd3032-de54-4229-87ff-25a39488582c
+		summarizeBy: none
+		sourceColumn: ts_inicio
+
+		variation Variation
+			isDefault
+			relationship: 140f2459-7919-4e0a-b833-e49d0d4f61e4
+			defaultHierarchy: LocalDateTable_416cfc2e-e6b7-427a-b507-d2b93e42940e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 28ca0a48-8324-4520-82af-16a0143dfb1b
+		summarizeBy: none
+		sourceColumn: fecha_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column hora_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 81dba93b-ac60-40b0-a94c-49cf557f04be
+		summarizeBy: none
+		sourceColumn: hora_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column tarifa_key
+		dataType: int64
+		formatString: 0
+		lineageTag: 127aa713-4e24-45f6-a767-4c332af83cf0
+		summarizeBy: sum
+		sourceColumn: tarifa_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column e_pv_kwh
+		dataType: double
+		lineageTag: ef3b47b5-1810-4547-b468-44ffecec9e5e
+		summarizeBy: sum
+		sourceColumn: e_pv_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column e_carga_kwh
+		dataType: double
+		lineageTag: e986ca0b-4529-4735-8970-93ba930b8590
+		summarizeBy: sum
+		sourceColumn: e_carga_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column e_red_kwh
+		dataType: double
+		lineageTag: 0139ba55-3b98-4bae-95d6-1ef4b33636fc
+		summarizeBy: sum
+		sourceColumn: e_red_kwh
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column soc_prom_pct
+		dataType: double
+		lineageTag: 29ccf7a7-4bc2-4280-afa7-0b5401578ddb
+		summarizeBy: sum
+		sourceColumn: soc_prom_pct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column n_lecturas
+		dataType: int64
+		formatString: 0
+		lineageTag: 27deffbf-ad50-4a49-9549-08908bdd7021
+		summarizeBy: sum
+		sourceColumn: n_lecturas
+
+		annotation SummarizationSetBy = Automatic
+
+	column n_validas
+		dataType: int64
+		formatString: 0
+		lineageTag: 262d7178-264d-43c0-ba8a-ebd10394ed35
+		summarizeBy: sum
+		sourceColumn: n_validas
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'gold fact_energia_intervalo' = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database("localhost", "silver"),
+				    gold_fact_energia_intervalo = Origen{[Schema="gold",Item="fact_energia_intervalo"]}[Data]
+				in
+				    gold_fact_energia_intervalo
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,90 @@
+table _Medidas
+	lineageTag: 442719fd-7828-4ca6-973e-0b2f44efee7d
+
+	measure 'Energía Solar (kWh)' = SUM('bi vw_powerbi_diario'[energia_solar_kwh])
+		lineageTag: 3b89fb24-2778-45a6-ab07-0c9c25f841e2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Carga Total (kWh)' = SUM('bi vw_powerbi_diario'[energia_carga_kwh])
+		lineageTag: bc2510f6-4a99-4929-b504-92418aa16ef7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Red Importada (kWh)' = SUM('bi vw_powerbi_diario'[energia_red_importada_kwh])
+		lineageTag: 36f0f72e-133a-4289-83e0-618be79b842d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Red Directa a Carga (kWh)' = SUM('bi vw_powerbi_diario'[energia_red_carga_kwh])
+		lineageTag: 754f0be2-d12e-470b-9750-08acc1e84a52
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Batería Descargada (kWh)' = SUM('bi vw_powerbi_diario'[energia_bateria_descargada_kwh])
+		lineageTag: 373b3edf-940a-4b81-a4ff-8895ffb67f04
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Autoconsumo Solar (kWh)' = SUM('bi vw_powerbi_diario'[autoconsumo_solar_kwh])
+		lineageTag: 88d624c4-c2d8-4268-a8e8-50206e139a2d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Autosuficiencia Solar %' = DIVIDE([Autoconsumo Solar (kWh)], [Carga Total (kWh)], 0)
+		lineageTag: 0d1a4622-9448-4ec9-a635-bcad4f52b6ec
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Ahorro Base (COP)' = SUM('bi vw_powerbi_diario'[costo_evitado_cop])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 6f5f11dc-483b-4a16-937e-93c3ba586290
+
+	measure 'Ahorro Neto (COP)' = SUM('bi vw_powerbi_diario'[ahorro_neto_cop])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: cb7af74a-ced7-49e7-9a47-eab80ee0bab1
+
+	measure 'Costo Importación Red (COP)' = SUM('bi vw_powerbi_diario'[costo_importacion_cop])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 94c5ea56-3dd4-468c-b2d6-edadbaffb401
+
+	measure 'Ahorro Escenario What-If (COP)' = [Autoconsumo Solar (kWh)] * SELECTEDVALUE('Tarifa Escenario'[Tarifa Escenario], 850)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 82219717-d19f-454c-af50-396569f13de7
+
+	measure 'Diferencia Escenario (COP)' = [Ahorro Escenario What-If (COP)] - [Ahorro Base (COP)]
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 99180bd5-a6b7-4de2-9642-170e2e03265a
+
+	measure 'Ahorro Mes Anterior (COP)' = CALCULATE([Ahorro Base (COP)], PREVIOUSMONTH('gold dim_fecha'[fecha]))
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 4a83bcdc-4f22-4ca5-9466-bddbb1d471d1
+
+	measure 'Variación Mensual Ahorro %' = DIVIDE([Ahorro Base (COP)] - [Ahorro Mes Anterior (COP)], [Ahorro Mes Anterior (COP)], 0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: f5e7fad7-8964-4f9c-a151-62c43401bad7
+
+	measure 'Ahorro Acumulado YTD (COP)' = TOTALYTD([Ahorro Base (COP)], 'gold dim_fecha'[fecha])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 16858270-224a-4a65-824f-51cc2b3e636d
+
+	measure 'Disponibilidad %' = DIVIDE(SUM('bi vw_calidad_diaria'[intervalos_presentes]), COUNTROWS('bi vw_calidad_diaria') * 96, 0)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 2c43ad43-98e6-4711-84f1-ec87469079ed
+
+	measure 'Datos Válidos %' = AVERAGE('bi vw_calidad_diaria'[datos_validos_pct]) / 100
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: d0bf93b5-d766-44e8-9bab-234c5fcd575f
+
+	partition _Medidas = m
+		mode: import
+		source =
+				let
+				    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Columna1 = _t]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"Columna1", type text}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Tipo cambiado",{"Columna1"})
+				in
+				    #"Columnas quitadas"
+
+	annotation PBI_ResultType = Table
+
