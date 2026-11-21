@@ -1,0 +1,64 @@
+# Desarrollo local (paso previo al cluster).  cp .env.example .env && docker compose up --build
+name: microrred-bi
+services:
+  postgres:
+    image: postgres:16.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      BI_LECTURA_PASSWORD: ${BI_LECTURA_PASSWORD}
+    ports: ["127.0.0.1:5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql/00_silver_contrato.sql:/docker-entrypoint-initdb.d/00_silver_contrato.sql:ro
+      - ./sql/01_ddl.sql:/docker-entrypoint-initdb.d/01_ddl.sql:ro
+      - ./k8s/postgres-init/02_operativo.sql:/docker-entrypoint-initdb.d/02_operativo.sql:ro
+      - ./sql/05_consumo_bi.sql:/docker-entrypoint-initdb.d/05_consumo_bi.sql:ro
+      - ./k8s/postgres-init/06_roles.sh:/docker-entrypoint-initdb.d/06_roles.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      retries: 12
+
+  grafana:
+    image: grafana/grafana-oss:11.3.0
+    depends_on: { postgres: { condition: service_healthy } }
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      BI_LECTURA_PASSWORD: ${BI_LECTURA_PASSWORD}
+    ports: ["127.0.0.1:3000:3000"]
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/provisioning/alerting:/etc/grafana/provisioning/alerting:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+  simulador:
+    build: { context: ., dockerfile: simulador/Dockerfile }
+    image: microrred/simulador:1.0.0
+    depends_on: { postgres: { condition: service_healthy } }
+    environment:
+      PGHOST: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      SIM_MODO: continuo
+      SIM_PASO_SEG: "20"
+      SIM_PUNTOS: "3"
+      SIM_ESCENARIO: ${SIM_ESCENARIO:-normal}
+
+  # Carga historica (opcional): docker compose --profile etl run --rm etl   (requiere data/opencem-*.sqlite)
+  etl:
+    profiles: ["etl"]
+    build: { context: ., dockerfile: k8s/etl/Dockerfile }
+    image: microrred/etl:1.0.0
+    depends_on: { postgres: { condition: service_healthy } }
+    environment:
+      PG_DSN: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      SQLITE_PATH: /data/${SQLITE_FILE:-opencem-v1.0.0.sqlite}
+    volumes: ["./data:/data:ro"]
+
+volumes:
+  pgdata:

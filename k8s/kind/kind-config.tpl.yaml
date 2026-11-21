@@ -1,0 +1,10 @@
+# up.* sustituye __DATA_DIR__ por la ruta absoluta de la carpeta data/ del repo.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: microrred
+nodes:
+  - role: control-plane
+    extraMounts:
+      - hostPath: __DATA_DIR__
+        containerPath: /data
+        readOnly: true

@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata: { name: simulador, namespace: microrred-bi }
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: simulador
+              image: microrred/simulador:1.0.0
+              imagePullPolicy: IfNotPresent      # imagen cargada con `kind load docker-image`
+              envFrom: [ { configMapRef: { name: bi-config } } ]
+              env:
+                - name: POSTGRES_USER
+                  valueFrom: { secretKeyRef: { name: bi-credentials, key: POSTGRES_USER } }
+                - name: POSTGRES_PASSWORD
+                  valueFrom: { secretKeyRef: { name: bi-credentials, key: POSTGRES_PASSWORD } }
+                - name: POSTGRES_DB
+                  valueFrom: { secretKeyRef: { name: bi-credentials, key: POSTGRES_DB } }
+              resources:
+                requests: { cpu: 25m, memory: 32Mi }
+                limits:   { cpu: 200m, memory: 128Mi }

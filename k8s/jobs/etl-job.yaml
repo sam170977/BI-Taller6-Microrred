@@ -1,0 +1,31 @@
+# Carga historica: corre UNA vez (Bronze -> Silver -> Gold) y termina. Se aplica con scripts/etl.*
+apiVersion: batch/v1
+kind: Job
+metadata: { name: etl-carga-historica, namespace: microrred-bi }
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: etl
+          image: microrred/etl:1.0.0
+          imagePullPolicy: IfNotPresent
+          envFrom: [ { configMapRef: { name: bi-config } } ]
+          env:
+            - name: POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: bi-credentials, key: POSTGRES_USER } }
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: bi-credentials, key: POSTGRES_PASSWORD } }
+            - name: POSTGRES_DB
+              valueFrom: { secretKeyRef: { name: bi-credentials, key: POSTGRES_DB } }
+            - name: PG_DSN            # $(VAR) lo expande Kubernetes con las variables anteriores
+              value: postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)
+          volumeMounts:
+            - { name: bronze, mountPath: /data, readOnly: true }   # Bronze: solo lectura
+          resources:
+            requests: { cpu: 200m, memory: 512Mi }
+            limits:   { cpu: "1",   memory: 2Gi }
+      volumes:
+        - name: bronze
+          hostPath: { path: /data, type: Directory }   # carpeta data/ del repo montada en el nodo kind
