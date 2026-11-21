@@ -1,0 +1,11 @@
+# Los archivos que se montan dentro de los contenedores (Linux) deben quedar siempre con saltos de
+# linea LF, aunque el repositorio se clone en Windows (donde Git los convertiria a CRLF y romperia
+# scripts como k8s/postgres-init/06_roles.sh).
+k8s/**              text eol=lf
+grafana/**          text eol=lf
+sql/**              text eol=lf
+etl/**              text eol=lf
+simulador/**        text eol=lf
+scripts/*.sh        text eol=lf
+docker-compose.yml  text eol=lf
+kustomization.yaml  text eol=lf
