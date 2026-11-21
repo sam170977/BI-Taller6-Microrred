@@ -1,0 +1,16 @@
+apiVersion: 1
+datasources:
+  - name: PostgreSQL Microrred
+    uid: postgres-microrred
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: postgres:5432              # nombre DNS del Service (Kubernetes) o del servicio (compose)
+    user: bi_lectura                # rol de SOLO LECTURA
+    isDefault: true
+    jsonData:
+      database: microrred_bi
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+    secureJsonData:
+      password: $BI_LECTURA_PASSWORD  # inyectada desde el Secret / .env, nunca en el repo

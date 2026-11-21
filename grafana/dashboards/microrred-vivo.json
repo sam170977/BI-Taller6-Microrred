@@ -1,0 +1,438 @@
+{
+  "uid": "microrred-vivo",
+  "title": "Microrred — Operativo en vivo (simulador)",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": false,
+  "refresh": "10s",
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "tags": [
+    "microrred",
+    "vivo"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "inversor",
+        "label": "Inversor",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "postgres-microrred"
+        },
+        "query": "SELECT inversor_id FROM gold.dim_inversor WHERE es_actual ORDER BY 1",
+        "definition": "SELECT inversor_id FROM gold.dim_inversor WHERE es_actual ORDER BY 1",
+        "refresh": 1,
+        "multi": false,
+        "includeAll": false,
+        "current": {
+          "text": "1",
+          "value": "1"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "gauge",
+      "title": "Estado de carga de baterías (SOC %)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT DISTINCT ON (inversor_id) ts AS time, 'Inversor ' || inversor_id AS metric, soc_prom_pct AS value FROM operativo.lectura_stream ORDER BY inversor_id, ts DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 20
+              },
+              {
+                "color": "green",
+                "value": 40
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 7,
+      "type": "gauge",
+      "title": "Disponibilidad de telemetría (% datos válidos, 10 min)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT now() AS time, 'Inversor ' || inversor_id AS metric, ROUND(100.0*SUM(n_validas)/NULLIF(SUM(n_lecturas),0),2) AS value FROM operativo.lectura_stream WHERE ts > now() - interval '10 minutes' GROUP BY inversor_id"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 80
+              },
+              {
+                "color": "green",
+                "value": 95
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Minutos desde el ultimo dato",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT now() AS time, 'Inversor ' || inversor_id AS metric, EXTRACT(EPOCH FROM (now() - max(ts)))/60 AS value FROM operativo.lectura_stream GROUP BY inversor_id"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "m",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 2
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Intercambio con la red pública: e_red_kwh (kWh por intervalo)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT DISTINCT ON (inversor_id) ts AS time, 'Inversor ' || inversor_id AS metric, e_red_kwh AS value FROM operativo.lectura_stream ORDER BY inversor_id, ts DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 3,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.75
+              },
+              {
+                "color": "red",
+                "value": 1.5
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Potencia y energía fotovoltaica vs. demanda de carga (kWh) — Inversor $inversor",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 16,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT ts AS \"time\", e_pv_kwh AS \"Solar\", e_carga_kwh AS \"Carga\", e_red_kwh AS \"Red\", e_bat_kwh AS \"Bateria (+descarga)\" FROM operativo.lectura_stream WHERE $__timeFilter(ts) AND inversor_id = $inversor ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Curva de SOC — Inversor $inversor",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 7,
+        "w": 8,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT ts AS \"time\", soc_prom_pct AS \"SOC\" FROM operativo.lectura_stream WHERE $__timeFilter(ts) AND inversor_id = $inversor ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 20
+              }
+            ]
+          },
+          "custom": {
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "table",
+      "title": "Estado actual por inversor (simulador)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT DISTINCT ON (inversor_id) inversor_id AS \"Inversor\", ts AS \"Última lectura\", e_pv_kwh AS \"Solar kWh\", e_carga_kwh AS \"Carga kWh\", e_red_kwh AS \"Red kWh\", soc_prom_pct AS \"SOC %\", n_validas AS \"Válidas\", n_lecturas AS \"Lecturas\", escenario AS \"Escenario\" FROM operativo.lectura_stream ORDER BY inversor_id, ts DESC"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Eventos del inversor (rango de tiempo del tablero)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 24,
+        "h": 6
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT ts AS \"Hora\", inversor_id AS \"Inversor\", severidad AS \"Severidad\", codigo AS \"Código\", descripcion AS \"Descripción\" FROM operativo.evento_inversor WHERE $__timeFilter(ts) ORDER BY ts DESC LIMIT 50"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    }
+  ]
+}

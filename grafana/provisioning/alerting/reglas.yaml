@@ -1,0 +1,187 @@
+apiVersion: 1
+groups:
+- orgId: 1
+  name: microrred-operativo
+  folder: Microrred
+  interval: 1m
+  rules:
+  - uid: soc-critico
+    title: Alerta SOC crítico
+    condition: C
+    for: 2m
+    noDataState: NoData
+    execErrState: Error
+    labels:
+      severidad: critica
+    annotations:
+      summary: SOC < 20 % en {{ $labels.inversor }}
+      descripcion: Evita descargas profundas que degradan las celdas. Mismo umbral BATERIA_BAJA de bi.vw_grafana_estado_actual.
+    data:
+    - refId: A
+      relativeTimeRange:
+        from: 600
+        to: 0
+      datasourceUid: postgres-microrred
+      model:
+        refId: A
+        datasource: &id002
+          type: grafana-postgresql-datasource
+          uid: postgres-microrred
+        editorMode: code
+        format: time_series
+        rawQuery: true
+        rawSql: SELECT DISTINCT ON (inversor_id) ts AS time, 'Inversor ' || inversor_id AS inversor, soc_prom_pct::float8 AS value FROM operativo.lectura_stream ORDER BY inversor_id, ts DESC
+    - refId: B
+      datasourceUid: __expr__
+      model:
+        refId: B
+        type: reduce
+        expression: A
+        reducer: last
+        datasource: &id001
+          type: __expr__
+          uid: __expr__
+    - refId: C
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: B
+        datasource: *id001
+        conditions:
+        - evaluator:
+            type: lt
+            params:
+            - 20
+  - uid: perdida-telemetria
+    title: Alerta de pérdida de telemetría
+    condition: C
+    for: 2m
+    noDataState: NoData
+    execErrState: Error
+    labels:
+      severidad: alta
+    annotations:
+      summary: Datos válidos < 95 % en {{ $labels.inversor }}
+      descripcion: 'Porcentaje de lecturas válidas (n_validas / n_lecturas) en una ventana de 10 min (acelerada: 150 min físicos); el informe habla de ventana horaria.'
+    data:
+    - refId: A
+      relativeTimeRange:
+        from: 600
+        to: 0
+      datasourceUid: postgres-microrred
+      model:
+        refId: A
+        datasource: *id002
+        editorMode: code
+        format: time_series
+        rawQuery: true
+        rawSql: SELECT now() AS time, 'Inversor ' || inversor_id AS inversor, (100.0*SUM(n_validas)/NULLIF(SUM(n_lecturas),0))::float8 AS value FROM operativo.lectura_stream WHERE ts > now() - interval '10 minutes' GROUP BY inversor_id
+    - refId: B
+      datasourceUid: __expr__
+      model:
+        refId: B
+        type: reduce
+        expression: A
+        reducer: last
+        datasource: *id001
+    - refId: C
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: B
+        datasource: *id001
+        conditions:
+        - evaluator:
+            type: lt
+            params:
+            - 95
+  - uid: fallo-inversor
+    title: Alerta de fallo de inversor
+    condition: C
+    for: 0s
+    noDataState: OK
+    execErrState: Error
+    labels:
+      severidad: critica
+    annotations:
+      summary: Evento grave en {{ $labels.inversor }}
+      descripcion: Notificación inmediata ante un evento de severidad grave en operativo.evento_inversor.
+    data:
+    - refId: A
+      relativeTimeRange:
+        from: 600
+        to: 0
+      datasourceUid: postgres-microrred
+      model:
+        refId: A
+        datasource: *id002
+        editorMode: code
+        format: time_series
+        rawQuery: true
+        rawSql: SELECT now() AS time, 'Inversor ' || inversor_id AS inversor, COUNT(*)::float AS value FROM operativo.evento_inversor WHERE severidad = 'grave' AND ts > now() - interval '5 minutes' GROUP BY inversor_id
+    - refId: B
+      datasourceUid: __expr__
+      model:
+        refId: B
+        type: reduce
+        expression: A
+        reducer: last
+        datasource: *id001
+    - refId: C
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: B
+        datasource: *id001
+        conditions:
+        - evaluator:
+            type: gt
+            params:
+            - 0
+  - uid: datos-obsoletos
+    title: Sin datos nuevos (disponibilidad del pipeline)
+    condition: C
+    for: 1m
+    noDataState: Alerting
+    execErrState: Error
+    labels:
+      severidad: alta
+    annotations:
+      summary: Más de 5 min sin datos de {{ $labels.inversor }}
+      descripcion: El simulador escribe cada minuto; 5 min sin lecturas equivalen a 5 ciclos perdidos.
+    data:
+    - refId: A
+      relativeTimeRange:
+        from: 600
+        to: 0
+      datasourceUid: postgres-microrred
+      model:
+        refId: A
+        datasource: *id002
+        editorMode: code
+        format: time_series
+        rawQuery: true
+        rawSql: SELECT now() AS time, 'Inversor ' || inversor_id AS inversor, (EXTRACT(EPOCH FROM (now() - max(ts)))/60)::float8 AS value FROM operativo.lectura_stream GROUP BY inversor_id
+    - refId: B
+      datasourceUid: __expr__
+      model:
+        refId: B
+        type: reduce
+        expression: A
+        reducer: last
+        datasource: *id001
+    - refId: C
+      datasourceUid: __expr__
+      model:
+        refId: C
+        type: threshold
+        expression: B
+        datasource: *id001
+        conditions:
+        - evaluator:
+            type: gt
+            params:
+            - 5

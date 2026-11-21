@@ -1,0 +1,247 @@
+{
+  "uid": "microrred-historico",
+  "title": "Microrred — Historico (capa Gold)",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": false,
+  "refresh": "",
+  "time": {
+    "from": "2026-06-01T00:00:00.000Z",
+    "to": "2026-07-14T00:00:00.000Z"
+  },
+  "timezone": "browser",
+  "tags": [
+    "microrred",
+    "historico"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "inversor",
+        "label": "Inversor",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "postgres-microrred"
+        },
+        "query": "SELECT inversor_id FROM gold.dim_inversor WHERE es_actual ORDER BY 1",
+        "definition": "SELECT inversor_id FROM gold.dim_inversor WHERE es_actual ORDER BY 1",
+        "refresh": 1,
+        "multi": false,
+        "includeAll": false,
+        "current": {
+          "text": "1",
+          "value": "1"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Energia por intervalo de 15 min — Inversor $inversor (kWh)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT time, e_pv_kwh AS \"Solar\", e_carga_kwh AS \"Carga\", e_red_kwh AS \"Red\" FROM bi.vw_grafana_energia WHERE $__timeFilter(time) AND inversor_id = $inversor ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "type": "gauge",
+      "title": "% de datos validos (periodo)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT now() AS time, ROUND(100.0*SUM(n_validas)/NULLIF(SUM(n_lecturas),0),2) AS value FROM bi.vw_grafana_energia WHERE $__timeFilter(time) AND inversor_id = $inversor"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 80
+              },
+              {
+                "color": "green",
+                "value": 95
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "SOC promedio — Inversor $inversor",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT time, soc_prom_pct AS \"SOC\" FROM bi.vw_grafana_energia WHERE $__timeFilter(time) AND inversor_id = $inversor ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Disponibilidad diaria de intervalos (%) — Inversor $inversor",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 9,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT fecha::timestamp AS time, disponibilidad_intervalos_pct AS \"Disponibilidad\" FROM bi.vw_calidad_diaria WHERE $__timeFilter(fecha::timestamp) AND inversor_id = $inversor ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 60
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "Ultimo estado disponible en Gold (bi.vw_grafana_estado_actual)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "postgres-microrred"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 24,
+        "h": 6
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "postgres-microrred"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT inversor_id AS \"Inversor\", ultima_lectura AS \"Ultima lectura\", e_pv_kwh AS \"Solar kWh\", e_carga_kwh AS \"Carga kWh\", e_red_kwh AS \"Red kWh\", soc_prom_pct AS \"SOC %\", datos_validos_pct AS \"% validos\", estado_bateria AS \"Estado bateria\" FROM bi.vw_grafana_estado_actual ORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    }
+  ]
+}

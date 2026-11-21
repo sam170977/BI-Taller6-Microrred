@@ -1,0 +1,12 @@
+# Parametros NO sensibles. Se cambian con `kubectl patch/edit` sin reconstruir imagenes.
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: bi-config, namespace: microrred-bi }
+data:
+  PGHOST: "postgres"                 # DNS del Service
+  PGPORT: "5432"
+  SIM_ESCENARIO: "normal"            # normal | nublado | falla_bateria | perdida_telemetria | falla_inversor | sin_datos
+  SIM_PUNTOS: "3"                    # intervalos por inversor en cada ejecucion
+  SIM_PASO_SEG: "15"                 # segundos entre intervalos
+  SIM_HORA: ""                       # "12" fuerza sol; "22" fuerza noche (demo)
+  SQLITE_PATH: "/data/opencem-v1.0.0.sqlite"   # AJUSTAR al nombre real del .sqlite descomprimido

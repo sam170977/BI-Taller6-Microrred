@@ -1,0 +1,29 @@
+# En la RAIZ del repo: kustomize no permite leer archivos fuera de su carpeta, y los ConfigMaps
+# se generan desde sql/ y grafana/ (las MISMAS fuentes que usa docker-compose; sin duplicar).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: microrred-bi
+resources:
+  - k8s/namespace.yaml
+  - k8s/configmap.yaml
+  - k8s/postgres.yaml
+  - k8s/grafana.yaml
+  - k8s/simulador-cronjob.yaml
+configMapGenerator:
+  - name: postgres-init            # se ejecutan en orden alfabetico al crear la BD por primera vez
+    files:
+      - sql/00_silver_contrato.sql
+      - sql/01_ddl.sql
+      - k8s/postgres-init/02_operativo.sql
+      - sql/05_consumo_bi.sql
+      - k8s/postgres-init/06_roles.sh
+  - name: grafana-datasources
+    files: [ grafana/provisioning/datasources/postgres.yaml ]
+  - name: grafana-dashboard-provider
+    files: [ grafana/provisioning/dashboards/provider.yaml ]
+  - name: grafana-alerting
+    files: [ grafana/provisioning/alerting/reglas.yaml ]
+  - name: grafana-dashboards
+    files:
+      - grafana/dashboards/microrred-vivo.json
+      - grafana/dashboards/microrred-historico.json
