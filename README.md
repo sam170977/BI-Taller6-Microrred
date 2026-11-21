@@ -35,7 +35,7 @@ Los datos **no** están en este repositorio. Descarga y verificación: ver [`dat
 ## Arquitectura
 
 <p align="center">
-  <img src="./data/diagrama_arquitectura_microrred.png"
+  <img src="./docs/diagrama_arquitectura_microrred.png"
        alt="Diagrama de arquitectura del proyecto"
        width="900">
 </p>
